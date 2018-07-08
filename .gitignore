@@ -262,3 +262,6 @@ __pycache__/
 
 # Visual Studio environment directory
 WebProject2/env
+
+# VS project file.
+.pyproj
