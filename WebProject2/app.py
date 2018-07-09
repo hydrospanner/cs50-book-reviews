@@ -1,11 +1,14 @@
 import os
 
-from flask import Flask, session
+from flask import Flask, session, render_template
 from flask_session import Session
+from flask_bootstrap import Bootstrap
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
+Bootstrap(app)
 
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
@@ -22,4 +25,12 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
 def index():
-    return "Project 1: TODO"
+    return render_template('home.html')
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/signup')
+def signup():
+    return render_template('signup.html')
