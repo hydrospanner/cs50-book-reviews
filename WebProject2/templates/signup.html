@@ -1,4 +1,6 @@
 ﻿{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
 
 {% block title %}
 Sign up
@@ -6,7 +8,13 @@ Sign up
 
 {% block content %}
 <div class="container">
-    <h1>Sign up</h1>
-    <p>Sign in to get started</p>
+    <form class="form-signin" method="post" action="/signup">
+        <h2 class="form-signin-heading">Sign up</h2>
+        {{form.hidden_tag() }}
+        {{wtf.form_field(form.username)}}
+        {{wtf.form_field(form.email)}}
+        {{wtf.form_field(form.password)}}
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form>
 </div>
 {% endblock %}
