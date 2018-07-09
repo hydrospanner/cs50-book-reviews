@@ -1,33 +1,55 @@
 import os
 
-from flask import Flask, session, render_template
+from flask import Flask, session, render_template, redirect, url_for
 from flask_session import Session
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import InputRequired, Email, Length
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_sqlalchemy  import SQLAlchemy
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import scoped_session, sessionmaker
 
+
+# Check for environment variable, prioritize URL from secrets.py
+if not os.getenv("DATABASE_URL"):
+    from secrets import DATABASE_URL
+    # raise RuntimeError("DATABASE_URL is not set")
+else:
+    DATABASE_URL = os.getenv("DATABASE_URL")
 
 app = Flask(__name__)
 Bootstrap(app)
-
-# Check for environment variable
-if not os.getenv("DATABASE_URL"):
-    raise RuntimeError("DATABASE_URL is not set")
+app.config['SECRET_KEY'] = "I'M A SECRET"
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config['SECRET_KEY'] = "I'M A SECRET"
-Session(app)
+# Session(app)
 
 # Set up database
-engine = create_engine(os.getenv("DATABASE_URL"))
-db = scoped_session(sessionmaker(bind=engine))
+# engine = create_engine(os.getenv("DATABASE_URL"))
+# db = scoped_session(sessionmaker(bind=engine))
+db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(15), unique=True)
+    email = db.Column(db.String(50), unique=True)
+    password = db.Column(db.String(80))
+
+    def __repr__(self):
+        return '<User %r>' % self.username
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 class LoginForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
@@ -41,14 +63,52 @@ class RegisterForm(FlaskForm):
 
 @app.route("/")
 def index():
-    return render_template('home.html')
+    books = []
+    # books = db.session.execute('SELECT title FROM books ORDER BY RANDOM() LIMIT 15').fetchall()
+    tables = db.session.execute('SELECT * FROM pg_catalog.pg_tables').fetchall()
+    # print([t[1] for t in tables])
+    users = db.session.execute('SELECT * FROM user LIMIT 15').fetchall()
+    count = db.session.execute('SELECT COUNT(*) FROM user').fetchone()
+    print('count: ', count)
+    print('USERS', users)
+    sql = '''SELECT *
+            FROM information_schema.columns
+    WHERE  table_name   = user'''
+    cols = db.session.execute(sql).fetchall()
+    print('user columns', cols)
+    if current_user.is_anonymous:
+        return render_template('home.html', books=books)
+    else:
+        return render_template('home.html', books=books, name=current_user.username)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user:
+            # if check_password_hash(user.password, form.password.data):
+            login_user(user, remember=form.remember.data)
+            return redirect(url_for('index'))
+        return '<h1>Invalid username or password</h1>'
     return render_template('login.html', form=form)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = RegisterForm()
+    if form.validate_on_submit():
+        new_user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+        db.session.add(new_user)
+        db.session.commit()
+        return 'yo'
+
     return render_template('signup.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    app.run(debug=True)

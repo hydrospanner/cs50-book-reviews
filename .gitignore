@@ -265,3 +265,5 @@ WebProject2/env
 
 # VS project file.
 *.pyproj
+
+secrets.py

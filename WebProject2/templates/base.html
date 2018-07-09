@@ -20,8 +20,14 @@
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="active"><a href="{{ url_for('index') }}">Home</a></li>
+                {% if name %}
+                <li><a href="{{ url_for('logout') }}">Log Out</a></li>
+                <li><a>Hey {{name}}</a></li>
+                {% else %}
                 <li><a href="{{ url_for('login') }}">Login</a></li>
                 <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+                {% endif %}
+                
             </ul>
         </div>
     </div>

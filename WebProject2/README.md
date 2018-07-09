@@ -1,3 +1,5 @@
-# Project 1
+# Book Review website
 
-Web Programming with Python and JavaScript
+Set envoronment variables:
+set DATABASE_URL = [postgres database url from heroku]
+set FLASK_ENV=development

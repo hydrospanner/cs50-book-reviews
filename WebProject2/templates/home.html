@@ -7,6 +7,16 @@ Rate books
 {% block content %}
 <div class="container">
     <h1>Rate Books</h1>
+    {% if name %}
+    Hey {{name}}
+    {% else %}
     <p>Sign in to get started</p>
+    {% endif %}
+    <ul>
+        {% for book in books %}
+            <li>{{book.title}}</li>
+        {% endfor %}
+
+    </ul>
 </div>
 {% endblock %}

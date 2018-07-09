@@ -42,6 +42,9 @@
     <Compile Include="import_data.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="secrets.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.md" />
