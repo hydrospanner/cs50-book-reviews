@@ -3,6 +3,9 @@ import os
 from flask import Flask, session, render_template
 from flask_session import Session
 from flask_bootstrap import Bootstrap
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField
+from wtforms.validators import InputRequired, Email, Length
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
