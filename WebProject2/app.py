@@ -82,7 +82,6 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user:
-            # if check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             return redirect(url_for('index'))
         return '<h1>Invalid username or password</h1>'
@@ -128,8 +127,8 @@ def book_detail(isbn):
         title, author, year = book
         d = {'isbn': isbn, 'title': title, 'author': author, 'year': year}
         res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": GOODREADS_KEY, "isbns": isbn})
-        print(res.json())
-        return render_template('book.html', book=d)
+        good_reads = res.json()['books'][0]
+        return render_template('book.html', book=d, good_reads=good_reads)
 
 
 if __name__ == '__main__':

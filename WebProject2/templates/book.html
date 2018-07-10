@@ -10,6 +10,22 @@ Book Details
     <h3>{{book.author}}</h3>
     <h6>ISBN: {{book.isbn}}</h6>
 
+    <h3>Good Reads data</h3>
+    <table class="table">
+        <tr>
+            <td>average rating</td>
+            <td>{{good_reads.average_rating}}</td>
+        </tr>
+        <tr>
+            <td>ratings count</td>
+            <td>{{good_reads.ratings_count}}</td>
+        </tr>
+        <tr>
+            <td>reviews count</td>
+            <td>{{good_reads.reviews_count}}</td>
+        </tr>
+    </table>
+
     <form class="form" method="post" action="/book">
         <h2 class="form-signin-heading">Leave Review</h2>
         <div class="form-group">
