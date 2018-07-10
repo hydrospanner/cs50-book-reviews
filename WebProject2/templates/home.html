@@ -12,11 +12,11 @@ Rate books
     {% else %}
     <h3><a href="{{ url_for('search') }}">Search books</a></h3>
     {% endif %}
-    <ul class="list-group">
+    <div class="list-group">
         {% for book in books %}
-            <li class="list-group-item">{{book.title}}</li>
+            <a href="/book/{{book.isbn}}" class="list-group-item">{{book.title}} ({{book.year}})</a>
         {% endfor %}
 
-    </ul>
+    </div>
 </div>
 {% endblock %}

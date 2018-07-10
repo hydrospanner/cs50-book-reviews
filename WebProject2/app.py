@@ -59,9 +59,14 @@ class RegisterForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
     password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=80)])
 
+def c_dict_list(column_names, l):
+    # return dictionary of rows with column keys
+    return [{c_name: col for c_name, col in zip(column_names, row)} for row in l]
+
 @app.route("/")
 def index():
-    books = db.session.execute('SELECT title FROM books ORDER BY RANDOM() LIMIT 15').fetchall()
+    books = db.session.execute('SELECT title, year, isbn FROM books ORDER BY RANDOM() LIMIT 15').fetchall()
+    books = c_dict_list(['title', 'year', 'isbn'], books)
     # tables = db.session.execute('SELECT * FROM pg_catalog.pg_tables').fetchall()
     users = db.session.execute('SELECT * FROM user LIMIT 15').fetchall()
     count = db.session.execute('SELECT COUNT(*) FROM user').fetchone()
@@ -104,6 +109,8 @@ def logout():
 
 def add_wildcard_symbols(l):
     return (f'%{i}%' for i in l)
+
+
 
 @app.route('/search', methods=['GET', 'POST'])
 @login_required
