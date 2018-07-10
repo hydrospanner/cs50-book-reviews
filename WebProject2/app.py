@@ -9,9 +9,6 @@ from wtforms.validators import InputRequired, Email, Length
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy  import SQLAlchemy
 
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import scoped_session, sessionmaker
-
 
 # Check for environment variable, prioritize URL from secrets.py
 if not os.getenv("DATABASE_URL"):
@@ -22,7 +19,6 @@ if not os.getenv("DATABASE_URL"):
 else:
     DATABASE_URL = os.getenv("DATABASE_URL")
 
-
 app = Flask(__name__)
 Bootstrap(app)
 app.config['SECRET_KEY'] = "I'M A SECRET"
@@ -31,11 +27,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-# Session(app)
 
-# Set up database
-# engine = create_engine(os.getenv("DATABASE_URL"))
-# db = scoped_session(sessionmaker(bind=engine))
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -66,7 +58,6 @@ class RegisterForm(FlaskForm):
 
 @app.route("/")
 def index():
-    books = []
     books = db.session.execute('SELECT title FROM books ORDER BY RANDOM() LIMIT 15').fetchall()
     # tables = db.session.execute('SELECT * FROM pg_catalog.pg_tables').fetchall()
     users = db.session.execute('SELECT * FROM user LIMIT 15').fetchall()
@@ -121,9 +112,7 @@ def search():
     isbn, title, author = add_wildcard_symbols([request.form['isbn'], request.form['title'], request.form['author']])
     l = db.session.execute('SELECT * FROM books WHERE isbn LIKE :isbn AND title LIKE :title AND author LIKE :author LIMIT 500',
                   {'isbn': isbn, 'title': title, 'author': author}).fetchall()
-    print(l)
     return render_template('searchresults.html', books=l)
-    return "I'm searchin here " + request.form['title']
 
 if __name__ == '__main__':
     app.run(debug=True)
