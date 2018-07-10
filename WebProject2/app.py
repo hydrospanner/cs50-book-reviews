@@ -112,6 +112,7 @@ def search():
     isbn, title, author = add_wildcard_symbols([request.form['isbn'], request.form['title'], request.form['author']])
     l = db.session.execute('SELECT * FROM books WHERE isbn LIKE :isbn AND title LIKE :title AND author LIKE :author LIMIT 500',
                   {'isbn': isbn, 'title': title, 'author': author}).fetchall()
+    l = [{'isbn': isbn, 'title': title, 'author': author, 'year': year} for isbn, title, author, year in l]
     return render_template('searchresults.html', books=l)
 
 @app.route('/book/<isbn>', methods=['GET', 'POST'])

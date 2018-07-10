@@ -6,11 +6,18 @@ Book Details
 
 {% block content %}
 <div class="container">
-    <h1>{{book.title}}</h1>
+    <h1>{{book.title}} ({{book.year}})</h1>
+    <h3>{{book.author}}</h3>
+    <h6>ISBN: {{book.isbn}}</h6>
 
     <form class="form" method="post" action="/book">
         <h2 class="form-signin-heading">Leave Review</h2>
-        <input name="review" type="text" class="form-control" placeholder="Review...">
+        <div class="form-group">
+            <label for="comment">Review:</label>
+            <textarea class="form-control" rows="5" name="review"></textarea>
+        </div>
+        Rating
+        <input name="rating" type="range" class="slider" min="0" max="5">
         <button class="btn btn-lg btn-primary btn-block" type="submit">Review</button>
     </form>
 </div>

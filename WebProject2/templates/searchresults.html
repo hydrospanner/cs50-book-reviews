@@ -21,9 +21,10 @@ Search Results
         </thead>
         {% for book in books %}
         <tr>            
-            {% for i in book %}
-            <td>{{i}}</td>
-            {% endfor %}
+            <td><a href="/book/{{book.isbn}}">{{book.isbn}}</a></td>
+            <td>{{book.title}}</td>
+            <td>{{book.author}}</td>
+            <td>{{book.year}}</td>
         </tr>
         {% endfor %}
 
