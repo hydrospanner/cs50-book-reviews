@@ -7,6 +7,9 @@ Search Results
 {% block content %}
 <div class="container">
     <h1>Search Results</h1>
+    {% if not books %}
+        <p>No results found.</p>
+    {% endif %}
     <table class="table table-hover">
         <thead>
             <tr>

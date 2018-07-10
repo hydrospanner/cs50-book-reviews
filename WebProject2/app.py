@@ -114,5 +114,17 @@ def search():
                   {'isbn': isbn, 'title': title, 'author': author}).fetchall()
     return render_template('searchresults.html', books=l)
 
+@app.route('/book/<isbn>', methods=['GET', 'POST'])
+@login_required
+def book_detail(isbn):
+    if request.method == 'GET':
+        book = db.session.execute('SELECT title, author, year FROM books WHERE isbn = :isbn', {'isbn': isbn}).fetchone()
+        if not book:
+            return 'invalid ISBN'
+        title, author, year = book
+        d = {'isbn': isbn, 'title': title, 'author': author, 'year': year}
+        return render_template('book.html', book=d)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

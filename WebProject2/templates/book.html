@@ -1,0 +1,17 @@
+﻿{% extends "base.html" %}
+
+{% block title %}
+Book Details
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{book.title}}</h1>
+
+    <form class="form" method="post" action="/book">
+        <h2 class="form-signin-heading">Leave Review</h2>
+        <input name="review" type="text" class="form-control" placeholder="Review...">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Review</button>
+    </form>
+</div>
+{% endblock %}
