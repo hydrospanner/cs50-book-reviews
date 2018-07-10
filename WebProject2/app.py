@@ -15,10 +15,13 @@ from flask_sqlalchemy  import SQLAlchemy
 
 # Check for environment variable, prioritize URL from secrets.py
 if not os.getenv("DATABASE_URL"):
-    from secrets import DATABASE_URL
-    # raise RuntimeError("DATABASE_URL is not set")
+    try:
+        from secrets import DATABASE_URL
+    except ImportError:
+        raise ImportError("DATABASE_URL is not set and no secrets.py found")
 else:
     DATABASE_URL = os.getenv("DATABASE_URL")
+
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -65,15 +68,13 @@ class RegisterForm(FlaskForm):
 def index():
     books = []
     books = db.session.execute('SELECT title FROM books ORDER BY RANDOM() LIMIT 15').fetchall()
-    tables = db.session.execute('SELECT * FROM pg_catalog.pg_tables').fetchall()
-    # print([t[1] for t in tables])
+    # tables = db.session.execute('SELECT * FROM pg_catalog.pg_tables').fetchall()
     users = db.session.execute('SELECT * FROM user LIMIT 15').fetchall()
     count = db.session.execute('SELECT COUNT(*) FROM user').fetchone()
     print('count: ', count)
     print('USERS', users)
-    sql = '''SELECT *
-            FROM information_schema.columns
-    WHERE  table_name   = user'''
+    sql = '''SELECT * FROM information_schema.columns
+            WHERE  table_name   = user'''
     cols = db.session.execute(sql).fetchall()
     print('user columns', cols)
     if current_user.is_anonymous:
@@ -109,11 +110,18 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+def add_wildcard_symbols(l):
+    return (f'%{i}%' for i in l)
+
 @app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
     if request.method == 'GET':
         return render_template('search.html')
+    isbn, title, author = add_wildcard_symbols([request.form['isbn'], request.form['title'], request.form['author']])
+    l = db.session.execute('SELECT * FROM books WHERE isbn LIKE :isbn AND title LIKE :title AND author LIKE :author LIMIT 500',
+                  {'isbn': isbn, 'title': title, 'author': author}).fetchall()
+    print(l)
     return "I'm searchin here " + request.form['title']
 
 if __name__ == '__main__':

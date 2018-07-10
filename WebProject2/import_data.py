@@ -5,8 +5,10 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 # Check for environment variable, prioritize URL from secrets.py
 if not os.getenv("DATABASE_URL"):
-    from secrets import DATABASE_URL
-    # raise RuntimeError("DATABASE_URL is not set")
+    try:
+        from secrets import DATABASE_URL
+    except ImportError:
+        raise ImportError("DATABASE_URL is not set and no secrets.py found")
 else:
     DATABASE_URL = os.getenv("DATABASE_URL")
 
