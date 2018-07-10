@@ -51,6 +51,7 @@
     <Content Include="requirements.txt" />
     <Content Include="static\base.css" />
     <Content Include="templates\base.html" />
+    <Content Include="templates\searchresults.html" />
     <Content Include="templates\search.html" />
     <Content Include="templates\login.html" />
     <Content Include="templates\signup.html" />

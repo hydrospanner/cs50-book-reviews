@@ -122,6 +122,7 @@ def search():
     l = db.session.execute('SELECT * FROM books WHERE isbn LIKE :isbn AND title LIKE :title AND author LIKE :author LIMIT 500',
                   {'isbn': isbn, 'title': title, 'author': author}).fetchall()
     print(l)
+    return render_template('searchresults.html', books=l)
     return "I'm searchin here " + request.form['title']
 
 if __name__ == '__main__':

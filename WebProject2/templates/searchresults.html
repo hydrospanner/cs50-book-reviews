@@ -1,0 +1,29 @@
+﻿{% extends "base.html" %}
+
+{% block title %}
+Search Results
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Search Results</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ISBN</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        {% for book in books %}
+        <tr>            
+            {% for i in book %}
+            <td>{{i}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+{% endblock %}
