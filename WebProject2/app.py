@@ -1,6 +1,5 @@
 import os
 import requests
-
 from flask import Flask, session, render_template, redirect, url_for, request
 from flask_session import Session
 from flask_bootstrap import Bootstrap
@@ -45,6 +44,7 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -73,8 +73,7 @@ def index():
     print('user columns', cols)
     if current_user.is_anonymous:
         return render_template('home.html', books=books)
-    else:
-        return render_template('home.html', books=books, name=current_user.username)
+    return render_template('home.html', books=books, name=current_user.username)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -83,7 +82,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user:
             login_user(user, remember=form.remember.data)
-            return redirect(url_for('index'))
+            return redirect(url_for('search'))
         return '<h1>Invalid username or password</h1>'
     return render_template('login.html', form=form)
 

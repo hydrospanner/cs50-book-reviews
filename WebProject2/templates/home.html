@@ -10,11 +10,11 @@ Rate books
     {% if not name %}
     <p>Sign in to get started</p>
     {% else %}
-    <a href="{{ url_for('search') }}">Search books</a>
+    <h3><a href="{{ url_for('search') }}">Search books</a></h3>
     {% endif %}
-    <ul>
+    <ul class="list-group">
         {% for book in books %}
-            <li>{{book.title}}</li>
+            <li class="list-group-item">{{book.title}}</li>
         {% endfor %}
 
     </ul>
