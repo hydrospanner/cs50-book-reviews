@@ -7,10 +7,10 @@ Rate books
 {% block content %}
 <div class="container">
     <h1>Rate Books</h1>
-    {% if name %}
-    Hey {{name}}
-    {% else %}
+    {% if not name %}
     <p>Sign in to get started</p>
+    {% else %}
+    <a href="{{ url_for('search') }}">Search books</a>
     {% endif %}
     <ul>
         {% for book in books %}

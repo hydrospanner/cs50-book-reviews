@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session, render_template, redirect, url_for
+from flask import Flask, session, render_template, redirect, url_for, request
 from flask_session import Session
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
@@ -64,7 +64,7 @@ class RegisterForm(FlaskForm):
 @app.route("/")
 def index():
     books = []
-    # books = db.session.execute('SELECT title FROM books ORDER BY RANDOM() LIMIT 15').fetchall()
+    books = db.session.execute('SELECT title FROM books ORDER BY RANDOM() LIMIT 15').fetchall()
     tables = db.session.execute('SELECT * FROM pg_catalog.pg_tables').fetchall()
     # print([t[1] for t in tables])
     users = db.session.execute('SELECT * FROM user LIMIT 15').fetchall()
@@ -100,8 +100,7 @@ def signup():
         new_user = User(username=form.username.data, email=form.email.data, password=form.password.data)
         db.session.add(new_user)
         db.session.commit()
-        return 'yo'
-
+        return redirect(url_for('index'))
     return render_template('signup.html', form=form)
 
 @app.route('/logout')
@@ -109,6 +108,13 @@ def signup():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+@app.route('/search', methods=['GET', 'POST'])
+@login_required
+def search():
+    if request.method == 'GET':
+        return render_template('search.html')
+    return "I'm searchin here " + request.form['title']
 
 if __name__ == '__main__':
     app.run(debug=True)
