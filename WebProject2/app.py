@@ -1,4 +1,5 @@
 import os
+import requests
 
 from flask import Flask, session, render_template, redirect, url_for, request
 from flask_session import Session
@@ -8,6 +9,8 @@ from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import InputRequired, Email, Length
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy  import SQLAlchemy
+
+from secrets import GOODREADS_KEY
 
 
 # Check for environment variable, prioritize URL from secrets.py
@@ -124,6 +127,8 @@ def book_detail(isbn):
             return 'invalid ISBN'
         title, author, year = book
         d = {'isbn': isbn, 'title': title, 'author': author, 'year': year}
+        res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": GOODREADS_KEY, "isbns": isbn})
+        print(res.json())
         return render_template('book.html', book=d)
 
 
