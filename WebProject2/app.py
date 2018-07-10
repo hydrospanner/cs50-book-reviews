@@ -115,7 +115,7 @@ def search():
     l = db.session.execute('SELECT * FROM books WHERE isbn LIKE :isbn AND title LIKE :title AND author LIKE :author LIMIT 500',
                   {'isbn': isbn, 'title': title, 'author': author}).fetchall()
     l = [{'isbn': isbn, 'title': title, 'author': author, 'year': year} for isbn, title, author, year in l]
-    return render_template('searchresults.html', books=l)
+    return render_template('searchresults.html', books=l, name=current_user.username)
 
 @app.route('/book/<isbn>', methods=['GET', 'POST'])
 @login_required
@@ -128,7 +128,7 @@ def book_detail(isbn):
         d = {'isbn': isbn, 'title': title, 'author': author, 'year': year}
         res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": GOODREADS_KEY, "isbns": isbn})
         good_reads = res.json()['books'][0]
-        return render_template('book.html', book=d, good_reads=good_reads)
+        return render_template('book.html', book=d, good_reads=good_reads, name=current_user.username)
 
 
 if __name__ == '__main__':

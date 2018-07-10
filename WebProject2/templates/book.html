@@ -10,7 +10,7 @@ Book Details
     <h3>{{book.author}}</h3>
     <h6>ISBN: {{book.isbn}}</h6>
 
-    <h3>Good Reads data</h3>
+    <h3><a href="https://www.goodreads.com/">Goodreads</a> Data</h3>
     <table class="table">
         <tr>
             <td>average rating</td>
@@ -33,7 +33,7 @@ Book Details
             <textarea class="form-control" rows="5" name="review"></textarea>
         </div>
         Rating
-        <input name="rating" type="range" class="slider" min="0" max="5">
+        <input name="rating" type="range" class="slider" step="0.1" min="0" max="5">
         <button class="btn btn-lg btn-primary btn-block" type="submit">Review</button>
     </form>
 </div>
