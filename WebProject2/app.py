@@ -4,7 +4,7 @@ from flask import Flask, session, render_template, redirect, url_for, request
 from flask_session import Session
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
+from wtforms import StringField, PasswordField, BooleanField, FloatField
 from wtforms.validators import InputRequired, Email, Length
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy  import SQLAlchemy
@@ -44,10 +44,20 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+class Reviews(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    isbn = db.Column(db.String(50))
+    review_text = db.Column(db.String(10000), nullable=False)
+    rating = db.Column(db.Float())
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+class ReviewForm(FlaskForm):
+    review_text = StringField('review_text', validators=[InputRequired(), Length(min=10, max=10000)])
+    rating = FloatField('rating', validators=[InputRequired()])
 
 class LoginForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
@@ -66,7 +76,7 @@ def c_dict_list(column_names, l):
 @app.route("/")
 def index():
     books = db.session.execute('SELECT title, year, isbn FROM books ORDER BY RANDOM() LIMIT 15').fetchall()
-    books = c_dict_list(['title', 'year', 'isbn'], books)
+    #books = c_dict_list(['title', 'year', 'isbn'], books) # how does template know names without this?
     # tables = db.session.execute('SELECT * FROM pg_catalog.pg_tables').fetchall()
     users = db.session.execute('SELECT * FROM user LIMIT 15').fetchall()
     count = db.session.execute('SELECT COUNT(*) FROM user').fetchone()
@@ -110,8 +120,6 @@ def logout():
 def add_wildcard_symbols(l):
     return (f'%{i}%' for i in l)
 
-
-
 @app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
@@ -126,15 +134,25 @@ def search():
 @app.route('/book/<isbn>', methods=['GET', 'POST'])
 @login_required
 def book_detail(isbn):
-    if request.method == 'GET':
-        book = db.session.execute('SELECT title, author, year FROM books WHERE isbn = :isbn', {'isbn': isbn}).fetchone()
-        if not book:
-            return 'invalid ISBN'
-        title, author, year = book
-        d = {'isbn': isbn, 'title': title, 'author': author, 'year': year}
-        res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": GOODREADS_KEY, "isbns": isbn})
-        good_reads = res.json()['books'][0]
-        return render_template('book.html', book=d, good_reads=good_reads, name=current_user.username)
+    form = ReviewForm()
+    book = db.session.execute('SELECT title, author, year FROM books WHERE isbn = :isbn', {'isbn': isbn}).fetchone()
+    if not book:
+        return 'invalid ISBN'
+    
+    if request.method == 'POST':
+        if not form.validate_on_submit():
+            return 'invalid rating'
+        new_review = Reviews(user_id=current_user.id, isbn=isbn, review_text=form.review_text.data,
+                             rating=form.rating.data)
+        db.session.add(new_review)
+        db.session.commit()
+    title, author, year = book
+    d = {'isbn': isbn, 'title': title, 'author': author, 'year': year}
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": GOODREADS_KEY, "isbns": isbn})
+    good_reads = res.json()['books'][0]
+    reviews = Reviews.query.filter_by(isbn=isbn).all()
+    return render_template('book.html', book=d, good_reads=good_reads, form=form, reviews=reviews,
+                           name=current_user.username)
 
 
 if __name__ == '__main__':
