@@ -148,12 +148,16 @@ def book_detail(isbn):
         db.session.commit()
     title, author, year = book
     d = {'isbn': isbn, 'title': title, 'author': author, 'year': year}
-    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": GOODREADS_KEY, "isbns": isbn})
-    good_reads = res.json()['books'][0]
+    good_reads = good_reads_data(isbn)
     reviews = Reviews.query.filter_by(isbn=isbn).all()
     return render_template('book.html', book=d, good_reads=good_reads, form=form, reviews=reviews,
                            name=current_user.username)
 
+def good_reads_data(isbn):
+    url = "https://www.goodreads.com/book/review_counts.json"
+    res = requests.get(url, params={"key": GOODREADS_KEY, "isbns": isbn})
+    if res.status_code == 200:
+        return res.json()['books'][0]
 
 if __name__ == '__main__':
     app.run(debug=True)
