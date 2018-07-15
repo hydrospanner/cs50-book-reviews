@@ -76,16 +76,6 @@ def c_dict_list(column_names, l):
 @app.route("/")
 def index():
     books = db.session.execute('SELECT title, year, isbn FROM books ORDER BY RANDOM() LIMIT 15').fetchall()
-    #books = c_dict_list(['title', 'year', 'isbn'], books) # how does template know names without this?
-    # tables = db.session.execute('SELECT * FROM pg_catalog.pg_tables').fetchall()
-    users = db.session.execute('SELECT * FROM user LIMIT 15').fetchall()
-    count = db.session.execute('SELECT COUNT(*) FROM user').fetchone()
-    print('count: ', count)
-    print('USERS', users)
-    sql = '''SELECT * FROM information_schema.columns
-            WHERE  table_name   = user'''
-    cols = db.session.execute(sql).fetchall()
-    print('user columns', cols)
     if current_user.is_anonymous:
         return render_template('home.html', books=books)
     return render_template('home.html', books=books, name=current_user.username)
