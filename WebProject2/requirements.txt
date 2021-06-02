@@ -14,7 +14,7 @@ Jinja2==2.10
 MarkupSafe==1.0
 pip==9.0.1
 psycopg2==2.7.5
-requests==2.19.1
+requests==2.20.0
 setuptools==28.8.0
 SQLAlchemy==1.2.9
 urllib3==1.26.5
